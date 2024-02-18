@@ -19,6 +19,9 @@ import {
 import { Search } from "@mui/icons-material";
 import SortIcon from "@mui/icons-material/Sort";
 import { Header } from "../components/Header";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import SearchIcon from "@mui/icons-material/Search";
 
 interface Post {
 	id: number;
@@ -31,13 +34,26 @@ interface Post {
 	createdAt: Date;
 }
 
+const names = [
+	"Sophia",
+	"Liam",
+	"Olivia",
+	"Noah",
+	"Ava",
+	"Elijah",
+	"Emma",
+	"William",
+	"Isabella",
+	"James",
+];
+
 const generateFakePosts = (): Post[] => {
 	// Generate fake posts with random data
 	const posts: Post[] = [];
 	for (let i = 1; i <= 10; i++) {
 		const post: Post = {
 			id: i,
-			user: `User ${i}`,
+			user: names[i],
 			avatar: `https://i.pravatar.cc/150?img=${i}`,
 			text: `This is the text of post ${i}`,
 			photo: `https://picsum.photos/600/400?random=${i}`,
@@ -75,7 +91,7 @@ const Posts: React.FC = () => {
 	};
 
 	const filteredPosts = posts.filter((post) =>
-		post.user.toLowerCase().includes(searchTerm.toLowerCase())
+		post?.user?.toLowerCase().includes(searchTerm.toLowerCase())
 	);
 
 	const open = Boolean(anchorEl);
@@ -140,57 +156,76 @@ const Posts: React.FC = () => {
 				</Box>
 
 				<Grid container spacing={3}>
-					{filteredPosts.map((post) => (
-						<Grid item xs={12} sm={6} md={4} key={post.id}>
-							<Card
-								sx={{
-									height: "100%",
-									display: "flex",
-									flexDirection: "column",
-									minWidth: "260px",
-								}}
-							>
-								<CardMedia
-									component="img"
-									image={post.photo}
-									alt={`Post ${post.id}`}
-									sx={{ objectFit: "cover", height: 200 }}
-								/>
-								<CardContent sx={{ flexGrow: 1 }}>
-									<Typography gutterBottom variant="h5" component="h2">
-										{post.text}
-									</Typography>
-									<Typography
-										variant="body2"
-										color="textSecondary"
-										component="p"
+					{!filteredPosts.length ? (
+						<Box
+							sx={{
+								display: "flex",
+								justifyContent: "center",
+								alignItems: "center",
+								minHeight: "20vh",
+							}}
+						>
+							<SearchIcon sx={{ mr: 1 }} />
+							<Typography variant="h5" align="center" color="textSecondary">
+								No posts found with that search criteria.
+							</Typography>
+						</Box>
+					) : (
+						filteredPosts.map((post) => (
+							<Grid item xs={12} sm={6} md={4} key={post.id}>
+								<Card
+									sx={{
+										height: "100%",
+										display: "flex",
+										flexDirection: "column",
+										minWidth: "260px",
+									}}
+								>
+									<CardMedia
+										component="img"
+										image={post.photo}
+										alt={`Post ${post.id}`}
+										sx={{ objectFit: "cover", height: 200 }}
+									/>
+									<CardContent sx={{ flexGrow: 1 }}>
+										<Typography gutterBottom variant="h5" component="h2">
+											{post.text}
+										</Typography>
+										<Typography
+											variant="body2"
+											color="textSecondary"
+											component="p"
+										>
+											Posted by {post.user}{" "}
+											{Math.floor(
+												(Date.now() - post.createdAt.getTime()) /
+													(1000 * 60 * 60 * 24)
+											)}{" "}
+											days ago
+										</Typography>
+									</CardContent>
+									<CardActions
+										sx={{ display: "flex", justifyContent: "space-between" }}
 									>
-										Posted by {post.user}{" "}
-										{Math.floor(
-											(Date.now() - post.createdAt.getTime()) /
-												(1000 * 60 * 60 * 24)
-										)}{" "}
-										days ago
-									</Typography>
-								</CardContent>
-								<CardActions>
-									<IconButton aria-label="add to favorites">
-										<span role="img" aria-label="heart">
-											❤️
-										</span>{" "}
-										{post.likes}
-									</IconButton>
-									<IconButton aria-label="comments">
-										<span role="img" aria-label="comments">
-											💬
-										</span>{" "}
-										{post.comments}
-									</IconButton>
-									<Avatar src={post.avatar} alt={post.user} />
-								</CardActions>
-							</Card>
-						</Grid>
-					))}
+										<div>
+											<IconButton aria-label="add to favorites">
+												<FavoriteBorderIcon /> {post.likes}
+											</IconButton>
+											<IconButton aria-label="comments">
+												<ChatBubbleOutlineIcon />
+												{post.comments}
+											</IconButton>
+										</div>
+										<Avatar
+											src={post.avatar}
+											alt={post.user}
+											sx={{ ml: "auto" }}
+										/>
+									</CardActions>
+								</Card>
+							</Grid>
+						))
+					)}
 				</Grid>
 			</Container>
 		</div>
